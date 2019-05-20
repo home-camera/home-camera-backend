@@ -32,6 +32,7 @@ process.chdir(__dirname);
 var sails;
 var rc;
 try {
+  require('dotenv').load();
   sails = require('sails');
   rc = require('sails/accessible/rc');
 } catch (err) {

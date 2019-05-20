@@ -21,6 +21,8 @@
 
 module.exports = {
 
+  dotenv.active = false,
+
   /**************************************************************************
   *                                                                         *
   * Tell Sails what database(s) it should use in production.                *
