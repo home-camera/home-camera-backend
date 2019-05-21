@@ -12,8 +12,7 @@ module.exports.seeds = {
     data: [
       {
         email: process.env.USER_EMAIL,
-        encrypted_password:  process.env.USER_PASSWORD,
-        confirmation_token: "token"
+        encryptedPassword:  process.env.USER_PASSWORD
       }
     ],
     unique: ['email']

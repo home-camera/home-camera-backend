@@ -3,32 +3,41 @@ const crypto = require('crypto');
 const fs = require('fs');
 
 module.exports = {
-  createToken: function(user) {
-    var cert_priv = fs.readFileSync(sails.config.jwt.key);
-    return jwt.sign({
-        user: user.toJSON()
-      },
-      cert_priv,
-      {
-        algorithm: sails.config.jwt.algorithm,
-        expiresIn: sails.config.jwt.expiresIn,
-        issuer: sails.config.jwt.issuer,
-        audience: sails.config.jwt.audience
+  createToken: function(payload, done) {
+    fs.readFile(sails.config.jwt.key, function(err, certPriv) {
+      if (err) {
+        done(err, null);
       }
-    );
+      jwt.sign(
+        payload,
+        certPriv,
+        {
+          algorithm: sails.config.jwt.algorithm,
+          expiresIn: sails.config.jwt.expiresIn,
+          issuer: sails.config.jwt.issuer,
+          audience: sails.config.jwt.audience
+        },
+        done);
+    });
   },
-  createRefreshToken: function() {
-    return crypto.randomBytes(sails.config.auth.refreshTokenBytes).toString('hex');
+  createRefreshToken: function(done) {
+    crypto.randomBytes(sails.config.auth.refreshTokenBytes, function(err, token) {
+      done(err, token.toString('hex'));
+    });
   },
-  createConfirmationToken: function() {
-    return crypto.randomBytes(sails.config.auth.confirmationTokenBytes).toString('hex');
-  },
-  verifyToken: function(token) {
-    var cert_pub = fs.readFileSync(sails.config.jwt.cert);
-    return jwt.verify(token, cert_pub, {
-      algorithm: sails.config.jwt.algorithm,
-      issuer: sails.config.jwt.issuer,
-      audience: sails.config.jwt.audience
+  verifyToken: function(token, done) {
+    fs.readFile(sails.config.jwt.cert, function(err, certPub) {
+      if (err) {
+        done(err, null);
+      }
+      jwt.verify(token,
+                certPub,
+                {
+                  algorithm: sails.config.jwt.algorithm,
+                  issuer: sails.config.jwt.issuer,
+                  audience: sails.config.jwt.audience
+                },
+              done);
     });
   }
 }

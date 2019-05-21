@@ -1,12 +1,18 @@
+const nodeMailer = require('nodemailer');
+
+const transporter = nodeMailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            service: process.env.SMTP_SERVICE,
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASSWORD
+            }
+          });
+
 module.exports = {
-  sendMail: async function(dest, subject) {
-    sails.hooks.email.send(
-      "", {},
-      {
-        to: dest,
-        subject: subject
-      },
-      function(err) {console.log(err || "It worked!");}
-    )
+  sendMail: async function(mailOptions, done) {
+    mailOptions.from = process.env.SMTP_USER;
+    transporter.sendMail(mailOptions, done);
   }
 };
