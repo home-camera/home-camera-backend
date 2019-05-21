@@ -5,8 +5,13 @@ module.exports = function(req, res, next) {
   if (bearer) {
     var token = bearer.split(' ')[1];
 
-    if (TokenService.verifyToken(token)) { // TODO: add check for expired time
+    try {
+      var decoded = TokenService.verifyToken(token);
+      // TODO: add check for expired time
+      req.user = decoded.user;
       next();
+    } catch (err) {
+      return res.sendStatus(401);
     }
   } else
     return res.sendStatus(401);

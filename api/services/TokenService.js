@@ -18,7 +18,10 @@ module.exports = {
     );
   },
   createRefreshToken: function() {
-    return crypto.randomBytes(sails.config.auth.randTokenBytes).toString('hex');
+    return crypto.randomBytes(sails.config.auth.refreshTokenBytes).toString('hex');
+  },
+  createConfirmationToken: function() {
+    return crypto.randomBytes(sails.config.auth.confirmationTokenBytes).toString('hex');
   },
   verifyToken: function(token) {
     var cert_pub = fs.readFileSync(sails.config.jwt.cert);

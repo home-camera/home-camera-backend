@@ -29,7 +29,11 @@ module.exports.routes = {
   'POST /api/auth/login': 'auth/AuthController.login',
   'POST /api/auth/logout': 'auth/AuthController.logout',
   'POST /api/auth/token': 'auth/AuthController.refreshToken',
-  'POST /api/auth/revoke': 'auth/AuthController.revokeToken'
+  'POST /api/auth/revoke': 'auth/AuthController.revokeToken',
+
+  'GET /api/auth/confirmation/new': 'auth/ConfirmationController.new',
+  'GET /api/auth/confirmation': 'auth/ConfirmationController.show',
+  'POST /api/auth/confirmation': 'auth/ConfirmationController.create'
 
   //  ╦ ╦╔═╗╔╗ ╦ ╦╔═╗╔═╗╦╔═╔═╗
   //  ║║║║╣ ╠╩╗╠═╣║ ║║ ║╠╩╗╚═╗
