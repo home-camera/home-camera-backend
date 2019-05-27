@@ -78,8 +78,13 @@ module.exports = {
         })
       })
       .catch(function(err) {
-        console.log(err);
-        return res.sendStatus(500);
+        if (err.code === 'E_INVALID_VALUES_TO_SET') {
+          return res.status(400).json({
+            err: 'password length must be in ' + sails.config.auth.password.length[0] +
+                 ' and ' + sails.config.auth.password.length[1]
+            });
+        }
+        return res.status(500).json({ err: err });
       });
   }
 };

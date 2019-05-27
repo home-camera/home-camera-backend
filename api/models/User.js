@@ -16,7 +16,9 @@ module.exports = {
     },
     encryptedPassword: {
       type: 'string',
-      required: true
+      required: true,
+      minLength: sails.config.auth.password.length[0],
+      maxLength: sails.config.auth.password.length[1]
     },
     resetToken: {
       type: 'string',
