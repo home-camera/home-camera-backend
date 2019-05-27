@@ -3,24 +3,28 @@ var refreshTokens = {};
 module.exports = {
   // POST /api/auth/login
   login: async function(req, res) {
+    if (req.body.email === null || req.body.email === '' ||
+        req.body.password === null || req.body.password === '') {
+      return res.sendStatus(400); // Bad Request
+    }
     var user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.sendStatus(401); // Unauthorized
     }
-    if (!user.isActive) {
-      return res.status(403).json({ error: 'user must be activated first' }); // Forbidden
-    }
-    CipherService.comparePassword(req.body.password, user.encryptedPassword, function(match) {
+    CipherService.comparePassword(req.body.password, user.encryptedPassword, (match) => {
       if (!match) {
         return res.sendStatus(401);
       }
 
-      TokenService.createToken({ 'user': user }, function(err, token) {
+      TokenService.createToken({ 'user': user }, (err, token) => {
         if (err) {
           return res.sendStatus(500);
         }
         res.set('Authorization', 'Bearer ' + token);
-        TokenService.createRefreshToken(function(err, refreshToken) {
+        if (!sails.config.auth.useRefreshTokens) {
+          return res.sendStatus(200);
+        }
+        TokenService.createRefreshToken((err, refreshToken) => {
           if (err) {
             return res.sendStatus(500);
           }
@@ -33,10 +37,12 @@ module.exports = {
   },
   // POST /api/auth/token
   refreshToken: function(req, res) {
+    if (!sails.config.auth.useRefreshTokens) {
+      return res.sendStatus(401);
+    }
     var refreshToken = req.body.token;
     if(refreshToken in refreshTokens) {
-      TokenService.createToken({ user: refreshTokens[refreshToken] },
-                      function(err, token) {
+      TokenService.createToken({ user: refreshTokens[refreshToken] }, (err, token) => {
         if (err) {
           return res.sendStatus(500);
         }
@@ -48,6 +54,9 @@ module.exports = {
   },
   // POST /api/auth/revoke
   revokeToken: function(req, res) {
+    if (!sails.config.auth.useRefreshTokens) {
+      return res.sendStatus(401);
+    }
     var refreshToken = req.body.token;
     if(refreshToken in refreshTokens) {
       refreshTokens = {}; // revoke all tokens
@@ -58,6 +67,8 @@ module.exports = {
   },
   // POST /api/auth/logout
   logout: function(req, res) {
-    return res.sendStatus(501);
+    TokenService.blacklistToken(req.token, function() {
+      return res.sendStatus(200);
+    });
   }
 };

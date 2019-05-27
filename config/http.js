@@ -9,6 +9,8 @@
  * https://sailsjs.com/config/http
  */
 
+const params = require('strong-params');
+
 module.exports.http = {
 
   /****************************************************************************
@@ -29,16 +31,16 @@ module.exports.http = {
     *                                                                          *
     ***************************************************************************/
 
-    // order: [
-    //   'cookieParser',
-    //   'session',
-    //   'bodyParser',
-    //   'compress',
-    //   'poweredBy',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    // ],
+    order: [
+      'cookieParser',
+      'session',
+      'bodyParser',
+      'compress',
+      'poweredBy',
+      'strongParameters',
+      'router',
+      'www'
+    ],
 
 
     /***************************************************************************
@@ -54,6 +56,9 @@ module.exports.http = {
     //   var middlewareFn = skipper({ strict: true });
     //   return middlewareFn;
     // })(),
+    strongParameters: (function() {
+      return require('strong-params').expressMiddleware();
+    })()
 
   },
 

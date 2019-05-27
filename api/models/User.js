@@ -18,21 +18,27 @@ module.exports = {
       type: 'string',
       required: true
     },
-    isActive: {
-      type: 'boolean',
-      defaultsTo: false
+    resetToken: {
+      type: 'string',
+      defaultsTo: ''
     },
-    activatedAt: {
+    resetTokenExpireTime: {
       type: 'number',
       defaultsTo: 0
     }
   },
 
   customToJSON: function() {
-    return _.omit(this, [ 'encryptedPassword' ]);
+    return _.omit(this, [ 'encryptedPassword',
+                          'resetToken',
+                          'resetExpireTime' ]);
   },
   beforeUpdate: function (user, next) {
-    CipherService.hashPassword(user, next);
+    if (user.encryptedPassword) {
+      CipherService.hashPassword(user, next);
+    } else {
+      return next();
+    }
   },
   beforeCreate: function (user, next) {
     CipherService.hashPassword(user, next);

@@ -1,14 +1,15 @@
 const jwt = require('jsonwebtoken');
+const jwtBlacklist = require('jwt-blacklist')(jwt);
 const crypto = require('crypto');
 const fs = require('fs');
 
 module.exports = {
   createToken: function(payload, done) {
-    fs.readFile(sails.config.jwt.key, function(err, certPriv) {
+    fs.readFile(sails.config.jwt.key, (err, certPriv) => {
       if (err) {
-        done(err, null);
+        return done(err, null);
       }
-      jwt.sign(
+      jwtBlacklist.sign(
         payload,
         certPriv,
         {
@@ -21,16 +22,16 @@ module.exports = {
     });
   },
   createRefreshToken: function(done) {
-    crypto.randomBytes(sails.config.auth.refreshTokenBytes, function(err, token) {
+    crypto.randomBytes(sails.config.auth.refreshTokenBytes, (err, token) => {
       done(err, token.toString('hex'));
     });
   },
   verifyToken: function(token, done) {
-    fs.readFile(sails.config.jwt.cert, function(err, certPub) {
+    fs.readFile(sails.config.jwt.cert, (err, certPub) => {
       if (err) {
-        done(err, null);
+        return done(err, null);
       }
-      jwt.verify(token,
+      jwtBlacklist.verify(token,
                 certPub,
                 {
                   algorithm: sails.config.jwt.algorithm,
@@ -39,5 +40,9 @@ module.exports = {
                 },
               done);
     });
+  },
+  blacklistToken: function(token, done) {
+    jwtBlacklist.blacklist(token);
+    done();
   }
-}
+};

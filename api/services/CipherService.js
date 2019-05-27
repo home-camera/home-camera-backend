@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 
 module.exports = {
   hashPassword: function (user, done) {
-    bcrypt.hash(user.encryptedPassword, sails.config.auth.saltLength, function(err, hash) {
+    bcrypt.hash(user.encryptedPassword, sails.config.auth.password.saltLength, (err, hash) => {
       if (err) {
         return done(err);
       }

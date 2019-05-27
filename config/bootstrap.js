@@ -11,6 +11,8 @@
 
 module.exports.bootstrap = async function(done) {
 
+  sails.params = require('strong-params');
+
   // By convention, this is a good place to set up fake data during development.
   //
   // For example:
@@ -26,6 +28,7 @@ module.exports.bootstrap = async function(done) {
   //   // etc.
   // ]);
   // ```
+
 
   // Don't forget to trigger `done()` when this bootstrap function's logic is finished.
   // (otherwise your server will never lift, since it's waiting on the bootstrap)
