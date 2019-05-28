@@ -3,15 +3,15 @@ var refreshTokens = {};
 module.exports = {
   // POST /api/auth/login
   login: async function(req, res) {
-    if (req.body.email === null || req.body.email === '' ||
-        req.body.password === null || req.body.password === '') {
-      return res.sendStatus(400); // Bad Request
+    var params = req.parameters.permit('email', 'password').value();
+    if (!(params.hasOwnProperty('email') && params.hasOwnProperty('password'))) {
+      return res.sendStatus(400);
     }
-    var user = await User.findOne({ email: req.body.email });
+    var user = await User.findOne({ email: params.email });
     if (!user) {
       return res.sendStatus(401); // Unauthorized
     }
-    CipherService.comparePassword(req.body.password, user.encryptedPassword, (match) => {
+    CipherService.comparePassword(params.password, user.encryptedPassword, (match) => {
       if (!match) {
         return res.sendStatus(401);
       }
@@ -40,7 +40,11 @@ module.exports = {
     if (!sails.config.auth.useRefreshTokens) {
       return res.sendStatus(401);
     }
-    var refreshToken = req.body.token;
+    var params = req.parameters.permit('token').value();
+    if (!params.hasOwnProperty('token')) {
+      return res.sendStatus(400);
+    }
+    var refreshToken = params.token;
     if(refreshToken in refreshTokens) {
       TokenService.createToken({ user: refreshTokens[refreshToken] }, (err, token) => {
         if (err) {
@@ -57,7 +61,11 @@ module.exports = {
     if (!sails.config.auth.useRefreshTokens) {
       return res.sendStatus(401);
     }
-    var refreshToken = req.body.token;
+    var params = req.parameters.permit('token').value();
+    if (!params.hasOwnProperty('token')) {
+      return res.sendStatus(400);
+    }
+    var refreshToken = params.token;
     if(refreshToken in refreshTokens) {
       refreshTokens = {}; // revoke all tokens
       return res.sendStatus(200);
@@ -67,7 +75,11 @@ module.exports = {
   },
   // POST /api/auth/logout
   logout: function(req, res) {
-    TokenService.blacklistToken(req.token, function() {
+    var params = req.parameters.permit('token').value();
+    if (!params.hasOwnProperty('token')) {
+      return res.sendStatus(400);
+    }
+    TokenService.blacklistToken(params.token, function() {
       return res.sendStatus(200);
     });
   }

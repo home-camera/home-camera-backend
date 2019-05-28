@@ -6,7 +6,7 @@ module.exports = function(req, res, next) {
       if (err) {
         return res.status(401).json({ message: err.message });
       }
-      req.user = decoded.user;
+      req.me = decoded.user;
       req.token = token;
       next();
     });

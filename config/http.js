@@ -35,9 +35,9 @@ module.exports.http = {
       'cookieParser',
       'session',
       'bodyParser',
+      'strongParameters',
       'compress',
       'poweredBy',
-      'strongParameters',
       'router',
       'www'
     ],

@@ -2,10 +2,11 @@ const moment = require('moment');
 
 module.exports = {
   create: async function(req, res) {
-    if (req.query.email === null || req.query.email === '') {
+    var params = req.parameters.permit('email').value();
+    if (!params.hasOwnProperty('email')) {
       return res.sendStatus(400); // Bad Request
     }
-    var user = await User.findOne({ email: req.query.email });
+    var user = await User.findOne({ email: params.email });
     if (!user) {
       return res.sendStatus(401); // Unauthorized
     }
@@ -13,7 +14,7 @@ module.exports = {
       if (err) {
         return res.status(500).json({ err: err });
       }
-      User.update({ email: req.query.email },
+      User.update({ email: params.email },
         {
           resetToken: random,
           resetTokenExpireTime: moment().add(sails.config.auth.password.resetExpireTime, 'seconds').unix()
@@ -39,28 +40,28 @@ module.exports = {
     });
   },
   update: async function(req, res) {
-    if (req.body.reset_password_token === null ||
-        req.body.reset_password_token === '' ||
-        req.body.password === null ||
-        req.body.password === '' ||
-        req.body.password_confirmation === null ||
-        req.body.password_confirmation === '') {
+    var params = req.parameters.permit('reset_password_token',
+                                       'password',
+                                       'password_confirmation').value();
+    if (!params.hasOwnProperty('reset_password_token') ||
+        !params.hasOwnProperty('password') ||
+        !params.hasOwnProperty('password_confirmation')) {
       return res.sendStatus(400); // Bad Request
     }
     // check password
-    if (req.body.password !== req.body.password_confirmation) {
+    if (params.password !== params.password_confirmation) {
       return res.sendStatus(400);
     }
-    var user = await User.findOne({ resetToken: req.body.reset_password_token });
+    var user = await User.findOne({ resetToken: params.reset_password_token });
     if (!user) {
       return res.status(401).json({ err: 'invalid token' }); // Unauthorized
     }
     if (!moment().isBefore(moment.unix(user.resetTokenExpireTime))) {
       return res.status(401).json({ err: 'token expired' });
     }
-    User.update({ resetToken: req.body.reset_password_token },
+    User.update({ resetToken: params.reset_password_token },
       {
-        encryptedPassword: req.body.password,
+        encryptedPassword: params.password,
         resetTokenExpireTime: 0
       })
       .then(function(updated) {
@@ -80,7 +81,7 @@ module.exports = {
       .catch(function(err) {
         if (err.code === 'E_INVALID_VALUES_TO_SET') {
           return res.status(400).json({
-            err: 'password length must be in ' + sails.config.auth.password.length[0] +
+            err: 'password length must be between ' + sails.config.auth.password.length[0] +
                  ' and ' + sails.config.auth.password.length[1]
             });
         }
