@@ -75,11 +75,7 @@ module.exports = {
   },
   // POST /api/auth/logout
   logout: function(req, res) {
-    var params = req.parameters.permit('token').value();
-    if (!params.hasOwnProperty('token')) {
-      return res.sendStatus(400);
-    }
-    TokenService.blacklistToken(params.token, function() {
+    TokenService.blacklistToken(req.token, function() {
       return res.sendStatus(200);
     });
   }
