@@ -20,6 +20,10 @@ module.exports = {
       minLength: sails.config.auth.password.length[0],
       maxLength: sails.config.auth.password.length[1]
     },
+    isActivated: {
+      type: 'boolean',
+      defaultsTo: false
+    },
     resetToken: {
       type: 'string',
       defaultsTo: ''

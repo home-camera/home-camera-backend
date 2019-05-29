@@ -6,6 +6,6 @@ module.exports.auth = {
     saltLength: 12,
     resetExpireTime: 600 // seconds (10minutes)
   },
-  resetPasswordRedirectUri: '',
+  resetPasswordRedirectUri: process.env.RESET_PASSWORD_REDIRECT_URI,
   useRefreshTokens: false
 };

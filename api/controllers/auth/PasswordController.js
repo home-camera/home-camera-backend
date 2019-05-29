@@ -23,9 +23,9 @@ module.exports = {
           const uri = sails.config.auth.resetPasswordRedirectUri;
           MailService.sendMail({
             to: user.email,
-            subject: 'Reset password <home-camera>',
-            text: 'Segui questo link per resettare la password: ' + uri + random,
-            html: 'Segui questo link per resettare la password: </br> <b>' + uri + random + '</b>'
+            subject: sails.__('resetPasswordMail.subject'),
+            text: sails.__('resetPasswordMail.text', uri, random),
+            html: sails.__('resetPasswordMail.html', uri, random)
           }, (err) => {
             if (err) {
               return res.status(500).json({ err: err });
@@ -62,14 +62,15 @@ module.exports = {
     User.update({ resetToken: params.reset_password_token },
       {
         encryptedPassword: params.password,
-        resetTokenExpireTime: 0
+        resetTokenExpireTime: 0,
+        isActivated: true
       })
       .then(function(updated) {
         MailService.sendMail({
           to: user.email,
-          subject: 'Reset password <home-camera>',
-          text: 'La tua password è stata modificata',
-          html: 'La tua password è stata modificata'
+          subject: sails.__('passwordChangedMail.subject'),
+          text: sails.__('passwordChangedMail.text', process.env.ADMIN_EMAIL),
+          html: sails.__('passwordChangedMail.html', process.env.ADMIN_EMAIL)
         }, (err) => {
           if (err) {
             return res.status(500).json({ err: err });
