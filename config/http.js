@@ -59,7 +59,6 @@ module.exports.http = {
     strongParameters: (function() {
       return require('strong-params').expressMiddleware();
     })()
-
   },
 
 };

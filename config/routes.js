@@ -29,8 +29,6 @@ module.exports.routes = {
   // user authentication
   'POST /api/auth/login': 'auth/AuthController.login',
   'POST /api/auth/logout': 'auth/AuthController.logout',
-  'POST /api/auth/token': 'auth/AuthController.refreshToken',
-  'POST /api/auth/revoke': 'auth/AuthController.revokeToken',
 
   // password reset
   'GET /api/password/new': 'auth/PasswordController.create',

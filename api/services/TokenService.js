@@ -21,11 +21,6 @@ module.exports = {
         done);
     });
   },
-  createRefreshToken: function(done) {
-    crypto.randomBytes(sails.config.auth.refreshTokenBytes, (err, token) => {
-      done(err, token.toString('hex'));
-    });
-  },
   verifyToken: function(token, done) {
     fs.readFile(sails.config.jwt.cert, (err, certPub) => {
       if (err) {

@@ -7,8 +7,15 @@ module.exports = function(req, res, next) {
         return res.status(401).json({ message: err.message });
       }
       req.me = decoded.user;
-      req.token = token;
-      next();
+      TokenService.blacklistToken(token, () => {
+        TokenService.createToken({ 'user': req.me }, (error, newToken) => {
+          if (error) {
+            return res.sendStatus(500);
+          }
+          res.set('Authorization', 'Bearer ' + newToken);
+          next();
+        });
+      });
     });
   } else {
     return res.sendStatus(401);
