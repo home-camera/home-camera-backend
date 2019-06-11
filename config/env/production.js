@@ -25,6 +25,10 @@ module.exports = {
     active: false
   },
 
+  cookies: {
+    secure: true
+  },
+
   /**************************************************************************
   *                                                                         *
   * Tell Sails what database(s) it should use in production.                *

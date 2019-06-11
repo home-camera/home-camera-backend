@@ -30,9 +30,9 @@ module.exports.security = {
 
   cors: {
     allRoutes: true,
-    allowOrigins: '*',
-  //   allowCredentials: false,
-    allowResponseHeaders: ['Authorization', 'expires_in']
+    allowOrigins: process.env.FRONTEND_ORIGIN,
+    allowCredentials: true,
+    //allowResponseHeaders: ['Authorization', 'expires_in']
   },
 
 
