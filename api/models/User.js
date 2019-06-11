@@ -35,9 +35,12 @@ module.exports = {
   },
 
   customToJSON: function() {
-    return _.omit(this, [ 'encryptedPassword',
+    return _.omit(this, [ 'createdAt',
+                          'updatedAt',
+                          'encryptedPassword',
+                          'isActivated',
                           'resetToken',
-                          'resetExpireTime' ]);
+                          'resetTokenExpireTime' ]);
   },
   beforeUpdate: function (user, next) {
     if (user.encryptedPassword) {

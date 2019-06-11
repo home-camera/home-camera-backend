@@ -39,7 +39,7 @@ module.exports = {
         });
     });
   },
-  update: async function(req, res) {
+  edit: async function(req, res) {
     var params = req.parameters.permit('reset_password_token',
                                        'password',
                                        'password_confirmation').value();
@@ -88,5 +88,55 @@ module.exports = {
         }
         return res.status(500).json({ err: err });
       });
+  },
+  update: async function(req, res) {
+    var params = req.parameters.permit('password',
+                                       'new_password',
+                                       'new_password_confirmation').value();
+    if (!params.hasOwnProperty('password') ||
+        !params.hasOwnProperty('new_password') ||
+        !params.hasOwnProperty('new_password_confirmation')) {
+      return res.sendStatus(400); // Bad Request
+    }
+    // check password
+    if (params.new_password !== params.new_password_confirmation) {
+      return res.sendStatus(400);
+    }
+    var user = await User.findOne({ email: req.me.email });
+    if (!user) {
+      return res.sendStatus(401); // Unauthorized
+    }
+    CipherService.comparePassword(params.password, user.encryptedPassword, (match) => {
+      if (!match) {
+        return res.sendStatus(401);
+      }
+      User.update({ email: req.me.email },
+        {
+          encryptedPassword: params.new_password
+        })
+        .then(function(updated) {
+          MailService.sendMail({
+            to: user.email,
+            subject: sails.__('passwordChangedMail.subject'),
+            text: sails.__('passwordChangedMail.text', process.env.ADMIN_EMAIL),
+            html: sails.__('passwordChangedMail.html', process.env.ADMIN_EMAIL)
+          }, (err) => {
+            if (err) {
+              return res.status(500).json({ err: err });
+            } else {
+              return res.sendStatus(200);
+            }
+          })
+        })
+        .catch(function(err) {
+          if (err.code === 'E_INVALID_VALUES_TO_SET') {
+            return res.status(400).json({
+              err: 'password length must be between ' + sails.config.auth.password.length[0] +
+                   ' and ' + sails.config.auth.password.length[1]
+              });
+          }
+          return res.status(500).json({ err: err });
+        });
+    });
   }
 };

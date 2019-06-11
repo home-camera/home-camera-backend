@@ -46,3 +46,4 @@ nbproject
 config/local.js
 *.env
 jwt-data
+*.tmp

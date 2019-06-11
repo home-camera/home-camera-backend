@@ -28,11 +28,12 @@ module.exports.security = {
   *                                                                          *
   ***************************************************************************/
 
-  // cors: {
-  //   allRoutes: false,
-  //   allowOrigins: '*',
+  cors: {
+    allRoutes: true,
+    allowOrigins: '*',
   //   allowCredentials: false,
-  // },
+    allowResponseHeaders: ['Authorization', 'expires_in']
+  },
 
 
   /****************************************************************************
