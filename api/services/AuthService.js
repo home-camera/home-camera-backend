@@ -1,22 +1,28 @@
+const moment = require('moment');
+
 module.exports = {
-  login: function(user, res) {
+  login: function(user, res, done) {
     TokenService.createToken({ 'user': user }, (err, token) => {
       if (err) {
-        return res.sendStatus(500);
+        done(true);
+        return;
       }
       //res.set('Authorization', 'Bearer ' + token);
       //res.set('expires_in', sails.config.jwt.expiresIn);
-      var expiration = sails.config.jwt.expiresIn;
-      var options = sails.config.cookies;
-      options.maxAge = expiration;
-      options.expires = new Date(Date.now() + expiration);
-      res.cookie('access_token', token, options);
-      res.cookie('expires_in', expiration, options);
-      return res.sendStatus(200);
+      const expiresIn = sails.config.jwt.expiresIn * 1000;
+      const expiration = new Date(Date.now() + expiresIn);
+      const options = { maxAge: expiresIn, expires: expiration, encode: String };
+      const secureOptions = Object.assign({}, sails.config.cookies.secure, options);
+      res.cookie('access_token', token, secureOptions);
+      res.cookie('expiration', expiration.toUTCString(), options);
+      console.log(expiration.toUTCString());
+      done(false);
     });
   },
   logout: function(req, res) {
     TokenService.blacklistToken(req.token, function() {
+      res.clearCookie('access_token');
+      res.clearCookie('expiration');
       return res.sendStatus(200);
     });
   },
@@ -26,8 +32,10 @@ module.exports = {
       //var token = bearer.split(' ')[1];
     var token = req.signedCookies['access_token'];
     if (token) {
+      console.log('policy token: ' + token);
       TokenService.verifyToken(token, (err, decoded) => {
         if (err) {
+          console.log(err);
           done(false);
           return;
         }
@@ -49,13 +57,14 @@ module.exports = {
         //res.set('Authorization', 'Bearer ' + newToken);
         //res.set('expires_in', sails.config.jwt.expiresIn);
         req.token = newToken;
-        var expiration = sails.config.jwt.expiresIn;
-        var options = sails.config.cookies;
-        options.maxAge = expiration;
-        options.expires = new Date(Date.now() + expiration);
-        options.overwrite = true;
-        res.cookie('access_token', newToken, options);
-        res.cookie('expires_in', expiration, options);
+        
+        const expiresIn = sails.config.jwt.expiresIn * 1000;
+        const expiration = new Date(Date.now() + expiresIn);
+        const options = { maxAge: expiresIn, expires: expiration, overwrite: true, encode: String };
+        const secureOptions = Object.assign({}, sails.config.cookies.secure, options);
+        res.cookie('access_token', newToken, secureOptions);
+        res.cookie('expiration', expiration.toUTCString(), options);
+        
         done(false);
       });
     });

@@ -26,7 +26,16 @@ module.exports = {
   },
 
   cookies: {
-    secure: true
+    secure: {
+      httpOnly: true,
+      signed: true,
+      secure: true
+    },
+    default: {
+      httpOnly: true,
+      signed: true,
+      secure: true
+    }
   },
 
   /**************************************************************************

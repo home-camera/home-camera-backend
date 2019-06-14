@@ -14,7 +14,7 @@ module.exports = {
         certPriv,
         {
           algorithm: sails.config.jwt.algorithm,
-          expiresIn: sails.config.jwt.expiresIn,
+          expiresIn: sails.config.jwt.expiresIn * 1000,
           issuer: sails.config.jwt.issuer,
           audience: sails.config.jwt.audience
         },

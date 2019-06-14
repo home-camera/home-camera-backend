@@ -15,7 +15,12 @@ module.exports = {
       if (!match) {
         return res.sendStatus(401);
       }
-      AuthService.login(user, res);
+      AuthService.login(user, res, (err) => {
+        if (err) {
+          return res.sendStatus(500);
+        }
+        return res.status(200).json({ user: user });
+      });
     });
   },
   // POST /api/auth/logout
