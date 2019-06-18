@@ -20,6 +20,10 @@ module.exports = {
       minLength: sails.config.auth.password.length[0],
       maxLength: sails.config.auth.password.length[1]
     },
+    isActivated: {
+      type: 'boolean',
+      defaultsTo: false
+    },
     resetToken: {
       type: 'string',
       defaultsTo: ''
@@ -31,9 +35,12 @@ module.exports = {
   },
 
   customToJSON: function() {
-    return _.omit(this, [ 'encryptedPassword',
+    return _.omit(this, [ 'createdAt',
+                          'updatedAt',
+                          'encryptedPassword',
+                          'isActivated',
                           'resetToken',
-                          'resetExpireTime' ]);
+                          'resetTokenExpireTime' ]);
   },
   beforeUpdate: function (user, next) {
     if (user.encryptedPassword) {

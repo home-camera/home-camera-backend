@@ -1,0 +1,8 @@
+{
+	"resetPasswordMail.subject": "Reset password <home-camera>",
+	"resetPasswordMail.text": "Segui questo link per resettare la password: %s%s",
+	"resetPasswordMail.html": "Segui questo link per resettare la password: </br><a href=\"%s/%s\" target=\"_blank\"><b>link</b></a>",
+  "passwordChangedMail.subject": "Password modificata <home-camera>",
+	"passwordChangedMail.text": "La tua password è stata modificata. Se non hai richiesto di modificare la password contatta l'amministratore a %s",
+	"passwordChangedMail.html": "La tua password è stata modificata. Se non hai richiesto di modificare la password contatta l'amministratore a <b>%s</b>"
+}

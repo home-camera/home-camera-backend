@@ -1,4 +1,9 @@
 {
-  "Welcome": "Welcome",
-  "A brand new app.": "A brand new app."
+	"resetPasswordMail.subject": "Reset password <home-camera>",
+	"resetPasswordMail.text": "Follow this link for password reset: %s%s",
+	"resetPasswordMail.html": "Follow this link for password reset: </br><a href=\"%s/%s\" target=\"_blank\"><b>link</b></a>",
+  "passwordChangedMail.subject": "Password changed <home-camera>",
+	"passwordChangedMail.text": "Your password has been changed. If you didn't request password reset contact admin at %s",
+	"passwordChangedMail.html": "Your password has been changed. If you didn't request password reset contact admin at <b>%s</b>"
+
 }

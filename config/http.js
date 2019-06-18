@@ -35,9 +35,9 @@ module.exports.http = {
       'cookieParser',
       'session',
       'bodyParser',
+      'strongParameters',
       'compress',
       'poweredBy',
-      'strongParameters',
       'router',
       'www'
     ],
@@ -59,7 +59,6 @@ module.exports.http = {
     strongParameters: (function() {
       return require('strong-params').expressMiddleware();
     })()
-
   },
 
 };

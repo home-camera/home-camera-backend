@@ -27,14 +27,16 @@ module.exports.routes = {
   //  ╠═╣╠═╝║  ║╣ ║║║ ║║╠═╝║ ║║║║║ ║ ╚═╗
   //  ╩ ╩╩  ╩  ╚═╝╝╚╝═╩╝╩  ╚═╝╩╝╚╝ ╩ ╚═╝
   // user authentication
-  'POST /api/auth/login': 'auth/AuthController.login',
-  'POST /api/auth/logout': 'auth/AuthController.logout',
-  'POST /api/auth/token': 'auth/AuthController.refreshToken',
-  'POST /api/auth/revoke': 'auth/AuthController.revokeToken',
+  'POST /api/auth/login':   'auth/AuthController.login',
+  'POST /api/auth/logout':  'auth/AuthController.logout',
+  'GET /api/auth/me':       'auth/AuthController.me',
 
   // password reset
   'GET /api/password/new': 'auth/PasswordController.create',
-  'POST /api/password': 'auth/PasswordController.update'
+  'POST /api/password': 'auth/PasswordController.edit',
+
+  // password change
+  'PUT /api/password': 'auth/PasswordController.update'
 
   //  ╦ ╦╔═╗╔╗ ╦ ╦╔═╗╔═╗╦╔═╔═╗
   //  ║║║║╣ ╠╩╗╠═╣║ ║║ ║╠╩╗╚═╗

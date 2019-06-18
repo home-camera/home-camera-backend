@@ -14,16 +14,11 @@ module.exports = {
         certPriv,
         {
           algorithm: sails.config.jwt.algorithm,
-          expiresIn: sails.config.jwt.expiresIn,
+          expiresIn: sails.config.jwt.expiresIn * 1000,
           issuer: sails.config.jwt.issuer,
           audience: sails.config.jwt.audience
         },
         done);
-    });
-  },
-  createRefreshToken: function(done) {
-    crypto.randomBytes(sails.config.auth.refreshTokenBytes, (err, token) => {
-      done(err, token.toString('hex'));
     });
   },
   verifyToken: function(token, done) {
