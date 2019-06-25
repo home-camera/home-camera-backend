@@ -1,8 +1,8 @@
 {
     "targets": [
         {
-            "target_name": "camera",
-            "sources": ["native/camera.cpp"],
+            "target_name": "camera_addon",
+            "sources": ["native/camera_addon.cpp"],
             "link_settings": {
                 "libraries": ["-lopencv_core", "-lopencv_highgui", "-lopencv_imgproc", "-lopencv_video", "-lopencv_ml"]
             },
