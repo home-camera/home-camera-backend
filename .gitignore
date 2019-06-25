@@ -47,3 +47,4 @@ config/local.js
 *.env
 jwt-data
 *.tmp
+build/*
