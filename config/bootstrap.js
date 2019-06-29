@@ -9,6 +9,8 @@
  * https://sailsjs.com/config/bootstrap
  */
 
+var cam = require('bindings')('addon.node');
+
 module.exports.bootstrap = async function(done) {
 
   sails.params = require('strong-params');
@@ -28,8 +30,16 @@ module.exports.bootstrap = async function(done) {
   //   // etc.
   // ]);
   // ```
-
-
+  cam.open({
+      width: 640,
+      height: 480,
+      fps: 25,
+      input: 0
+    },
+    function(image) {}
+  );
+  
+  console.log('after cam.Open()');
   // Don't forget to trigger `done()` when this bootstrap function's logic is finished.
   // (otherwise your server will never lift, since it's waiting on the bootstrap)
   return done();
