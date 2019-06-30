@@ -1,17 +1,39 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/core/ocl.hpp>
+#include <ctime>
+#include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <vector>
 
 #include "frame_processing_async_worker.hpp"
 
-FrameProcessingAsyncWorker::FrameProcessingAsyncWorker(Camera* camera,
+static std::string get_file_timestamp() {
+  time_t t = time(0);   // get time now
+  struct tm tm = *localtime(&t);
+  char datum[128];
+  sprintf(datum, "%d-%d-%d", tm.tm_year+1900, tm.tm_mon + 1, tm.tm_mday);
+  return std::string(datum);
+}
+
+static std::string get_timestamp() {
+  time_t t = time(0);   // get time now
+  struct tm tm = *localtime(&t);
+  char datum[128];
+  sprintf(datum, "%d:%d:%d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+  return std::string(datum);
+}
+
+FrameProcessingAsyncWorker::FrameProcessingAsyncWorker(size_t queueSize,
+                                                  Camera* camera,
                                                   Napi::Function& callback) 
                                                 : Napi::AsyncWorker(callback),
                                                 camera(camera),
-                                                running(true) {
-  this->framesQueue = new boost::lockfree::spsc_queue<cv::Mat>(100);
+                                                running(false) {
+  this->framesQueue = new boost::lockfree::spsc_queue<cv::Mat>(queueSize);
 }
 
 FrameProcessingAsyncWorker::~FrameProcessingAsyncWorker() {
@@ -28,6 +50,10 @@ void FrameProcessingAsyncWorker::Execute() {
   std::vector<std::vector<cv::Point>> cnts;
   double thr = 10.;
   int contours = 500;
+  cv::VideoWriter* writer = nullptr;
+  volatile bool motion = false;
+
+  this->running = true;
 
   while (!this->framesQueue->pop(frame))
     ;
@@ -51,28 +77,30 @@ void FrameProcessingAsyncWorker::Execute() {
     cv::dilate(thresh, thresh, cv::Mat(), cv::Point(-1,-1), 2);
     cv::findContours(thresh, cnts, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-    std::vector<cv::Rect> boundRect(cnts.size());
-    std::vector<std::vector<cv::Point>> contours_poly(cnts.size());
-
     for(unsigned int i = 0; i < cnts.size(); i++) {
       if(contourArea(cnts[i]) < contours) {
         continue;
       }
-      approxPolyDP(cnts[i], contours_poly[i], 3, true);
-      boundRect[i] = cv::boundingRect(contours_poly[i]);
-      cv::rectangle(frame, boundRect[i].tl(), boundRect[i].br(), cv::Scalar(0,255,0), 2, 8, 0);
-      cv::putText(frame, "Motion Detected", cv::Point(10, 20), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255,255,255),2);
+      motion = true;
     }
-    
-    //imshow("Difference Frame", frameDelta);
 
-    if (frame.size().height > 0 && frame.size().width > 0) {
-      imshow("Camera Frame", frame);
-      imshow("Threshold Frame", thresh);
-      cv::waitKey(20);
-      //std::cout << "Frame" << std::endl;
+    if (motion) {
+      struct stat buffer;
+      std::string path = get_file_timestamp() + ".avi";
+      if (stat(path.c_str(), &buffer) != 0) {
+        writer = new cv::VideoWriter(path, camera->GetVideoCodec(), camera->GetFps(), frame.size(), true);
+      }
+      cv::rectangle(frame, cv::Point2f(0, frame.rows - 40), cv::Point2f(170, frame.rows), cv::Scalar(255, 255, 255), -1);
+      cv::putText(frame, get_timestamp(), cv::Point2f(8, frame.rows - 10), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 4);
+      writer->write(frame);
+      motion = false;
     }
+
     prevFrame = gray.clone();
+  }
+  if (nullptr != writer) {
+    writer->release();
+    delete writer;
   }
 }
 

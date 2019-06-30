@@ -8,6 +8,7 @@
 // TODO: concurrent_map<std::string /* input */, Camera*> cameras;
 // TODO: concurrent_map<Camera*, CameraReaderAsyncWorker*> readers;
 CameraReaderAsyncWorker* worker;
+CameraStreamerAsyncWorker* streamer;
 Camera* camera;
 
 // TODO: return CameraWrapper

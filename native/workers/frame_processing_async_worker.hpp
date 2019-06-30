@@ -7,7 +7,7 @@
 
 class FrameProcessingAsyncWorker : public Napi::AsyncWorker {
   public:
-    FrameProcessingAsyncWorker(Camera* camera, Napi::Function& callback);
+    FrameProcessingAsyncWorker(size_t queueSize, Camera* camera, Napi::Function& callback);
     ~FrameProcessingAsyncWorker();
     void StopProcessing();
     void SendFrame(cv::Mat frame);

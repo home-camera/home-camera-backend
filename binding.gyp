@@ -7,7 +7,8 @@
                 "native/camera/camera.cpp",
                 "native/camera/frame.cpp",
                 "native/workers/camera_reader_async_worker.cpp",
-                "native/workers/frame_processing_async_worker.cpp"
+                "native/workers/frame_processing_async_worker.cpp",
+                "native/workers/camera_streamer_async_worker.cpp"
             ],
             "link_settings": {
                 "libraries": ["-lopencv_core", "-lopencv_highgui", "-lopencv_imgproc", "-lopencv_video", "-lopencv_ml"]

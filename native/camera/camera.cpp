@@ -4,7 +4,7 @@ Camera::Camera() {
   this->capture = new cv::VideoCapture();
   this->width = this->height = this->fps = 0;
   this->imageCodec = ".jpg";
-  this->videoCodec = "";
+  this->videoCodec = cv::VideoWriter::fourcc('D', 'I', 'V', 'X');
   this->isOpen = false;
 }
 
@@ -28,7 +28,7 @@ std::string Camera::GetImageCodec() const {
   return this->imageCodec;
 }
 
-std::string Camera::GetVideoCodec() const {
+int Camera::GetVideoCodec() const {
   return this->videoCodec;
 }
 
@@ -56,7 +56,7 @@ void Camera::SetImageCodec(std::string imageCodec) {
     this->imageCodec = imageCodec;
 }
 
-void Camera::SetVideoCodec(std::string videoCodec) {
+void Camera::SetVideoCodec(int videoCodec) {
   if (!this->IsOpen())
     this->videoCodec = videoCodec;
 }

@@ -5,14 +5,26 @@
 CameraReaderAsyncWorker::CameraReaderAsyncWorker(Camera* camera, 
                                                 Napi::Function& callback) 
                                                 : Napi::AsyncWorker(callback),
-                                                camera(camera) {
-  this->frameProcessing = new FrameProcessingAsyncWorker(camera, callback);
+                                                camera(camera),
+                                                cameraStreamer(nullptr) {
+  this->frameProcessing = new FrameProcessingAsyncWorker(100, camera, callback);
   this->frameProcessing->Queue();
 }
 
 CameraReaderAsyncWorker::~CameraReaderAsyncWorker() {
   this->frameProcessing->StopProcessing();
   delete this->frameProcessing;
+}
+
+void CameraReaderAsyncWorker::AttachStreamer(CameraStreamerAsyncWorker* streamer) {
+  if (nullptr == this->cameraStreamer) {
+    this->cameraStreamer = streamer;
+    this->cameraStreamer->Queue();
+  }
+}
+
+void CameraReaderAsyncWorker::DetachStreamer() {
+  this->cameraStreamer = nullptr;
 }
 
 void CameraReaderAsyncWorker::Execute() {  
@@ -37,9 +49,10 @@ void CameraReaderAsyncWorker::Execute() {
     //}
     
     // notify frame
-    if (!frame->GetFrame().empty())
-      this->frameProcessing->SendFrame(frame->GetFrame());
-    
+    this->frameProcessing->SendFrame(frame->GetFrame());
+    if (nullptr != this->cameraStreamer)
+      this->cameraStreamer->SendImage(frame->GetImage());
+
     delete frame;
   }
 }
