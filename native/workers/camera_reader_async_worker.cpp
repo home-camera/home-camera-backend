@@ -2,65 +2,75 @@
 
 #include "camera_reader_async_worker.hpp"
 
-CameraReaderAsyncWorker::CameraReaderAsyncWorker(Camera* camera, 
-                                                Napi::Function& callback) 
-                                                : Napi::AsyncWorker(callback),
-                                                camera(camera),
-                                                cameraStreamer(nullptr) {
-  this->frameProcessing = new FrameProcessingAsyncWorker(100, camera, callback);
-  this->frameProcessing->Queue();
-}
+namespace Native::Camera {
 
-CameraReaderAsyncWorker::~CameraReaderAsyncWorker() {
-  this->frameProcessing->StopProcessing();
-  delete this->frameProcessing;
-}
-
-void CameraReaderAsyncWorker::AttachStreamer(CameraStreamerAsyncWorker* streamer) {
-  if (nullptr == this->cameraStreamer) {
-    this->cameraStreamer = streamer;
-    this->cameraStreamer->Queue();
+  CameraReaderAsyncWorker::CameraReaderAsyncWorker(CameraNative& camera, 
+                                                  Napi::Function& callback) 
+                                                  : Napi::AsyncWorker(callback),
+                                                  running(false),
+                                                  camera(camera) {
+    this->frameProcessing = new FrameProcessingAsyncWorker(procBuffers, camera, callback);
   }
-}
 
-void CameraReaderAsyncWorker::DetachStreamer() {
-  this->cameraStreamer = nullptr;
-}
-
-void CameraReaderAsyncWorker::Execute() {  
-  while(this->camera->IsOpen()) {  
-    Frame* frame = new Frame();
-
-    //Capture Frame From WebCam
-    this->camera->ReadFrame(frame);
-
-    //if(message->resize) {
-      //cv::Size size = cv::Size(message->width,message->height);
-      //cv::resize(tmp,rsz,size);
-      //msg->frame = rsz;
-      //Update Size
-      //preview_width = message->width;
-      //preview_height = message->height;
-    //} else {
-      //msg->frame = tmp;
-      //Update Size
-      //preview_width = tmp.size().width;
-      //preview_height = tmp.size().height;
-    //}
-    
-    // notify frame
-    this->frameProcessing->SendFrame(frame->GetFrame());
-    if (nullptr != this->cameraStreamer)
-      this->cameraStreamer->SendImage(frame->GetImage());
-
-    delete frame;
+  CameraReaderAsyncWorker::~CameraReaderAsyncWorker() {
+    //this->frameProcessing->StopProcessing();
+    //delete this->frameProcessing;
   }
-}
 
-void CameraReaderAsyncWorker::OnOK() {
-  
-}
+  void CameraReaderAsyncWorker::Queue() {
+    this->running = true;
+    Napi::AsyncWorker::Queue();
+    this->frameProcessing->Queue();
+  }
 
-void CameraReaderAsyncWorker::OnError(const Napi::Error& e) {
+  void CameraReaderAsyncWorker::Execute() {  
+    while(this->running && this->camera.IsOpen()) {  
+      //Frame* frame = new Frame();
+      //this->camera.ReadFrame(frame);
+      cv::Mat frame;
+      this->camera.GetVideoCapture() >> frame;
+
+      if (frame.empty())
+        continue;
+      
+      if (frame.size().height > 0 && frame.size().width > 0) {
+        cv::imshow("Preview", frame);
+        cv::waitKey(20);
+      }
+      //if(message->resize) {
+        //cv::Size size = cv::Size(message->width,message->height);
+        //cv::resize(tmp,rsz,size);
+        //msg->frame = rsz;
+        //Update Size
+        //preview_width = message->width;
+        //preview_height = message->height;
+      //} else {
+        //msg->frame = tmp;
+        //Update Size
+        //preview_width = tmp.size().width;
+        //preview_height = tmp.size().height;
+      //}
+      
+      // notify frame
+      assert(!frame.empty());
+      this->procBuffers.add(frame.clone());
+      //if (nullptr != this->cameraStreamer)
+      //  this->cameraStreamer->SendImage(frame->GetImage());
+      //delete frame;
+    }
+  }
+
+  void CameraReaderAsyncWorker::Stop() {
+    this->running = false;
+    this->frameProcessing->StopProcessing();
+  }
+
+  void CameraReaderAsyncWorker::OnOK() {
+    this->camera.Close();
+  }
+
+  void CameraReaderAsyncWorker::OnError(const Napi::Error& e) {
+
+  }
 
 }

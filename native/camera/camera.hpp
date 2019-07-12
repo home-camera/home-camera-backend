@@ -1,40 +1,34 @@
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
+#ifndef _CAMERA_WRAPPER_H_
+#define _CAMERA_WRAPPPER_H_
 
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include "frame.hpp"
+#include <napi.h>
+#include "camera_native.hpp"
+#include "../workers/camera_reader_async_worker.hpp"
 
-class Camera {
-  public:
-    Camera();
-    ~Camera();
+namespace Native::Camera{
+  
+  class Camera : public Napi::ObjectWrap<Camera> {
+    public:
+      static Napi::Object Init(Napi::Env env, Napi::Object exports);
+      static Napi::Object NewInstance(Napi::Env env, Napi::Value arg);
+      Camera(const Napi::CallbackInfo& info);
+      ~Camera();
+    private:
+      static Napi::FunctionReference constructor;
+      void Open(const Napi::CallbackInfo& info);
+      void Close(const Napi::CallbackInfo& info);
+      Napi::Value GetFps(const Napi::CallbackInfo& info);
+      Napi::Value GetWidth(const Napi::CallbackInfo& info);
+      Napi::Value GetHeight(const Napi::CallbackInfo& info);
+      Napi::Value GetImageCodec(const Napi::CallbackInfo& info);
+      Napi::Value GetVideoCodec(const Napi::CallbackInfo& info);
+      Napi::Value GetInputSource(const Napi::CallbackInfo& info);
 
-    int32_t GetWidth() const;
-    int32_t GetHeight() const;
-    int32_t GetFps() const;
-    std::string GetImageCodec() const;
-    int GetVideoCodec() const;
-    cv::VideoCapture* GetVideoCapture() const;
-    
-    void SetWidth(int32_t width);
-    void SetHeight(int32_t height);
-    void SetFps(int32_t fps);
-    void SetImageCodec(std::string imageCodec);
-    void SetVideoCodec(int videoCodec);
+      Napi::Value input;
+      CameraNative cameraNative;
+      CameraReaderAsyncWorker* readerWorker;
+  };
 
-    void Open(int device);
-    void Open(std::string filename);
+}
 
-    bool IsOpen() const;
-
-    void ReadFrame(Frame* frame);
-  private:
-    int32_t width, height, fps;
-    cv::VideoCapture* capture;
-    std::string imageCodec;
-    int videoCodec;
-    bool isOpen;
-};
-
-#endif /* _CAMERA_H_ */
+#endif /* _CAMERA_WRAPPER_H_ */
