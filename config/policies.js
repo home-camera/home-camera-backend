@@ -24,5 +24,16 @@ module.exports.policies = {
   'auth/PasswordController': {
     'create': true,
     'edit': true
+  },
+  'camera/CameraController': {
+    'index': true,
+    'show': true,
+    'create': true,
+    'update': true,
+    'delete': true,
+    'open': true,
+    'close': true,
+    'startRecording': true,
+    'stopRecording': true,
   }
 };

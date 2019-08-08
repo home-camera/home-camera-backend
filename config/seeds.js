@@ -16,5 +16,16 @@ module.exports.seeds = {
       }
     ],
     unique: ['email']
-  }
+  },
+  camera: [
+    {
+      name: 'soggiorno',
+      width: 640,
+      height: 480,
+      fps: 15,
+      imageCodec: 'jpeg',
+      videoCodec: 'divx',
+      input: '0'
+    }
+  ]
 };

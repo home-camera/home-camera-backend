@@ -23,3 +23,10 @@
         * PORT
 
 2. Create `JWT` certificates into `JWT_CERTS_DIR` directory
+
+3. Comment code into `opencv4nodejs` source module:
+        ```
+            //if (!self->self.isOpened()) {
+                //  return tryCatch.throwError("failed to open capture");
+            //}
+        ```

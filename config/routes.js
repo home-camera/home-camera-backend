@@ -36,8 +36,20 @@ module.exports.routes = {
   'POST /api/password': 'auth/PasswordController.edit',
 
   // password change
-  'PUT /api/password': 'auth/PasswordController.update'
+  'PUT /api/password': 'auth/PasswordController.update',
 
+  // camera
+  'GET /api/cameras': 'camera/CameraController.index',
+  'GET /api/cameras/:id': 'camera/CameraController.show',
+  'POST /api/cameras': 'camera/CameraController.create',
+  'PATCH /api/cameras/:id': 'camera/CameraController.update',
+  'DELETE /api/cameras/:id': 'camera/CameraController.delete',
+
+  'GET /api/cameras/:id/open': 'camera/CameraController.open',
+  'GET /api/cameras/:id/close': 'camera/CameraController.close',
+
+  'GET /api/cameras/:id/recording': 'camera/CameraController.startRecording',
+  'DELETE /api/cameras/:id/recording': 'camera/CameraController.stopRecording',
   //  ╦ ╦╔═╗╔╗ ╦ ╦╔═╗╔═╗╦╔═╔═╗
   //  ║║║║╣ ╠╩╗╠═╣║ ║║ ║╠╩╗╚═╗
   //  ╚╩╝╚═╝╚═╝╩ ╩╚═╝╚═╝╩ ╩╚═╝
